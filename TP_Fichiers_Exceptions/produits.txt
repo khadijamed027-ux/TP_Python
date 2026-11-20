@@ -1,0 +1,5 @@
+Stylo;100
+Cahier;1200
+Sac;8000
+Regle;50
+Colle;500

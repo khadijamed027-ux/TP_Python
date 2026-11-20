@@ -1,0 +1,93 @@
+Stylo;500
+Cahier;1200
+Sac;15000
+Règle;250
+Colle;800
+f = open("produits.txt", "w", encoding="utf-8")
+for i in range(5):
+    designation = input("Désignation : ")
+    prix = input("Prix : ")
+    f.write(designation + ";" + prix + "\n")
+f.close()
+total = 0
+n = 0
+f = open("produits.txt", "r", encoding="utf-8")
+print(f"{'Désignation':<15}{'Prix':>10}")
+print("-" * 25)
+for ligne in f:
+    designation, prix = ligne.strip().split(";")
+    prix = float(prix)
+    print(f"{designation:<15}{prix:>10.2f}")
+    total = total + prix
+    n = n + 1
+f.close()
+print("-" * 25)
+print("Prix moyen :", round(total / n, 2))
+
+f = open("produits.txt", "r", encoding="utf-8")
+lignes = f.readlines()
+f.close()
+
+total = 0
+for ligne in lignes:
+    morceaux = ligne.strip().split(";")
+    designation = morceaux[0]
+    prix = float(morceaux[1])
+    print(designation.ljust(15), prix)
+    total = total + prix
+
+print("Prix moyen :", total / len(lignes))
+
+import csv
+
+f = open("operations.csv", "r", encoding="utf-8")
+lecteur = csv.reader(f, delimiter=";")
+next(lecteur)  # on saute la ligne d'en-tête
+for ligne in lecteur:
+    date, compte, type_op, montant = ligne
+    annee, mois, jour = date.split("-")
+    date_fr = jour + "/" + mois + "/" + annee
+    try:
+        montant = f"{int(montant):,}".replace(",", " ")
+    except ValueError:
+        pass  # montant vide ou invalide : affiché tel quel
+    print(date_fr, compte, type_op, montant)
+f.close()
+
+import csv
+
+soldes = {}
+nb_ignorees = 0
+
+f = open("operations.csv", "r", encoding="utf-8")
+lecteur = csv.reader(f, delimiter=";")
+next(lecteur)
+numero = 1  # l'en-tête est la ligne 1
+for ligne in lecteur:
+    numero = numero + 1
+    date, compte, type_op, montant = ligne
+    try:
+        montant = int(montant)
+    except ValueError:
+        nb_ignorees = nb_ignorees + 1
+        print("Ligne", numero, "ignorée (montant invalide)")
+        continue
+    if compte not in soldes:
+        soldes[compte] = 0
+    if type_op == "Dépôt":
+        soldes[compte] = soldes[compte] + montant
+    else:
+        soldes[compte] = soldes[compte] - montant
+f.close()
+
+print("Lignes ignorées :", nb_ignorees)
+for compte in sorted(soldes):
+    print(compte, soldes[compte])
+
+g = open("soldes.csv", "w", encoding="utf-8", newline="")
+ecrivain = csv.writer(g, delimiter=";")
+ecrivain.writerow(["compte", "solde"])
+for compte in sorted(soldes):
+    ecrivain.writerow([compte, soldes[compte]])
+g.close()
+
